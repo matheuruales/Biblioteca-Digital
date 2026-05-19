@@ -14,7 +14,7 @@ Esta entrega cubre la parte de Matheu:
 - CRUD de autores, categorias y libros.
 - Busqueda avanzada y filtros de libros.
 
-No incluye reportes, graficos, CSV ni PDF.
+La parte de reportes, graficos, CSV, PDF y dashboard administrativo queda cubierta en la seccion de Dev 3.
 
 ## Préstamos, Reservas y Sanciones (Dev 2)
 
@@ -104,3 +104,25 @@ curl "http://127.0.0.1:8000/api/books/?search=garcia&availability=available"
 .venv/bin/python manage.py check
 .venv/bin/python manage.py test
 ```
+
+## Dashboard, Reportes y Exportaciones (Dev 3)
+
+### Frontend administrativo
+
+- `GET /admin-dashboard/`
+
+La pantalla administrativa consume las APIs de reportes con un token JWT de bibliotecario, muestra metricas generales, alertas operativas, graficos, tablas y acciones de exportacion.
+
+### Endpoints
+
+- `GET /api/dashboard/` resumen administrativo: libros, usuarios, prestamos, reservas, sanciones, inventario y alertas.
+- `GET /api/reports/` reportes agregados: libros mas reservados, autores mas leidos, prestamos por mes y usuarios con mas prestamos.
+- `GET /api/reports/export/csv/?report=loans_by_month`
+- `GET /api/reports/export/pdf/?report=loans_by_month`
+
+Reportes soportados para exportacion:
+
+- `most_reserved_books`
+- `most_read_authors`
+- `loans_by_month`
+- `top_users_by_loans`
