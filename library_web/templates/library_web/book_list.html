@@ -1,0 +1,77 @@
+{% extends base_template %}
+{% block title %}Libros - Biblioteca Digital{% endblock %}
+{% block page_title %}Libros{% endblock %}
+{% block content %}
+<section class="toolbar">
+    <div>
+        <p class="eyebrow">Catalogo</p>
+        <h2>Libros</h2>
+        <span>Busqueda por titulo, ISBN, autor, categoria y disponibilidad.</span>
+    </div>
+    {% if request.user.is_librarian %}
+    <a class="ui-button ui-button-primary" href="{% url 'library_web:book_create' %}">Nuevo libro</a>
+    {% endif %}
+</section>
+
+<form class="filter-panel" method="get">
+    <input name="search" placeholder="Buscar en todo" value="{{ request.GET.search }}">
+    <select name="author">
+        <option value="">Autor</option>
+        {% for author in authors %}
+        <option value="{{ author.id }}" {% if request.GET.author == author.id|stringformat:'s' %}selected{% endif %}>{{ author.name }}</option>
+        {% endfor %}
+    </select>
+    <select name="category">
+        <option value="">Categoria</option>
+        {% for category in categories %}
+        <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:'s' %}selected{% endif %}>{{ category.name }}</option>
+        {% endfor %}
+    </select>
+    <select name="availability">
+        <option value="">Disponibilidad</option>
+        <option value="available" {% if request.GET.availability == 'available' %}selected{% endif %}>Disponible</option>
+        <option value="unavailable" {% if request.GET.availability == 'unavailable' %}selected{% endif %}>No disponible</option>
+    </select>
+    <button class="ui-button ui-button-secondary" type="submit">Filtrar</button>
+</form>
+
+<section class="ui-card table-card">
+    <div class="table-responsive">
+        <table class="ui-table">
+            <thead>
+                <tr>
+                    <th>Titulo</th>
+                    <th>ISBN</th>
+                    <th>Autores</th>
+                    <th>Categorias</th>
+                    <th>Copias</th>
+                    <th>Estado</th>
+                    <th class="table-actions">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td><strong>{{ book.title }}</strong></td>
+                    <td><code>{{ book.isbn }}</code></td>
+                    <td>{% for author in book.authors.all %}{{ author.name }}{% if not forloop.last %}, {% endif %}{% empty %}-{% endfor %}</td>
+                    <td>{% for category in book.categories.all %}{{ category.name }}{% if not forloop.last %}, {% endif %}{% empty %}-{% endfor %}</td>
+                    <td>{{ book.available_copies }}/{{ book.total_copies }}</td>
+                    <td>{% if book.available_copies > 0 %}<span class="ui-badge ui-badge-success">Disponible</span>{% else %}<span class="ui-badge ui-badge-warning">Prestado</span>{% endif %}</td>
+                    <td class="table-actions">
+                        {% if request.user.is_librarian %}
+                        <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:book_update' book.id %}">Editar</a>
+                        <a class="ui-button ui-button-danger ui-button-sm" href="{% url 'library_web:book_delete' book.id %}">Eliminar</a>
+                        {% else %}
+                        <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:reader_reservation_create' %}?book={{ book.id }}">Reservar</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7"><div class="empty-state">No hay libros con esos filtros.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

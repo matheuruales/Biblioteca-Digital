@@ -1,20 +1,70 @@
 # Biblioteca Digital - Matheu
 
-Backend Django REST para autenticacion, usuarios, catalogo de libros y busqueda avanzada.
+Aplicacion web Django para gestion de biblioteca digital con autenticacion, roles, CRUD, prestamos, reservas, sanciones, dashboard, graficos y exportaciones.
 
 ## Alcance
 
-Esta entrega cubre la parte de Matheu:
+El sistema incluye:
 
-- Registro e inicio de sesion con JWT.
+- Registro, inicio de sesion y cierre de sesion web.
+- Autenticacion API con JWT.
 - Recuperacion de contrasena por correo en consola.
 - Roles de usuario: lector y bibliotecario.
 - Estados de usuario: activo y bloqueado.
-- CRUD de usuarios.
+- CRUD web y API de usuarios.
 - CRUD de autores, categorias y libros.
+- Reservas, prestamos, devoluciones y sanciones por retraso.
 - Busqueda avanzada y filtros de libros.
+- Dashboard con graficos dinamicos.
+- Reportes y exportacion CSV/PDF.
+- Conexion PostgreSQL/Supabase mediante `DATABASE_URL`.
 
-La parte de reportes, graficos, CSV, PDF y dashboard administrativo queda cubierta en la seccion de Dev 3.
+## Rutas Web Principales
+
+- `/` redirige a login o a la interfaz correcta segun rol.
+- `/login/` inicio de sesion.
+- `/register/` registro de lectores.
+- `/logout/` cierre de sesion.
+- `/lector/` portal lector.
+- `/lector/libros/` catalogo y busqueda.
+- `/lector/reservas/` reservas del lector.
+- `/lector/prestamos/` prestamos del lector.
+- `/lector/sanciones/` sanciones del lector.
+- `/bibliotecario/` dashboard administrativo con graficos.
+- `/bibliotecario/libros/` CRUD y busqueda de libros.
+- `/bibliotecario/autores/` CRUD de autores.
+- `/bibliotecario/categorias/` CRUD de categorias.
+- `/bibliotecario/usuarios/` CRUD de usuarios.
+- `/bibliotecario/reservas/` gestion de reservas.
+- `/bibliotecario/prestamos/` gestion de prestamos.
+- `/bibliotecario/sanciones/` consulta de sanciones.
+- `/bibliotecario/reportes/` reportes y exportaciones.
+
+## Credenciales De Prueba
+
+```text
+Bibliotecario
+usuario: matheu_admin
+password: Biblioteca2026!
+```
+
+```text
+Lector
+usuario: matheu_lector
+password: Biblioteca2026!
+```
+
+Para recrearlas:
+
+```bash
+.venv/bin/python manage.py create_test_users
+```
+
+Para crear libros, autores, categorias, reservas, prestamos y sanciones de demostracion:
+
+```bash
+.venv/bin/python manage.py seed_demo_data
+```
 
 ## Préstamos, Reservas y Sanciones (Dev 2)
 
@@ -43,9 +93,13 @@ python manage.py circulation_maintenance
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python manage.py migrate
+.venv/bin/python manage.py create_test_users
+.venv/bin/python manage.py seed_demo_data
 .venv/bin/python manage.py createsuperuser
 .venv/bin/python manage.py runserver
 ```
+
+Si existe `.env` con `DATABASE_URL`, Django usa Supabase/PostgreSQL. Si no existe, usa `db.sqlite3`.
 
 ## Endpoints De Autenticacion
 
@@ -105,13 +159,15 @@ curl "http://127.0.0.1:8000/api/books/?search=garcia&availability=available"
 .venv/bin/python manage.py test
 ```
 
-## Dashboard, Reportes y Exportaciones (Dev 3)
+## Dashboard, Reportes y Exportaciones
 
-### Frontend administrativo
+### Frontend administrativo web
 
-- `GET /admin-dashboard/`
+- `GET /bibliotecario/`
+- `GET /bibliotecario/reportes/`
+- `GET /admin-dashboard/` redirige a `/bibliotecario/`
 
-La pantalla administrativa consume las APIs de reportes con un token JWT de bibliotecario, muestra metricas generales, alertas operativas, graficos, tablas y acciones de exportacion.
+La pantalla administrativa usa sesion Django, muestra metricas generales, alertas operativas, graficos, tablas y acciones de exportacion. El lector tiene una interfaz separada en `/lector/` y no ve navegacion administrativa.
 
 ### Endpoints
 

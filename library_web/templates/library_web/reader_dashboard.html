@@ -1,0 +1,127 @@
+{% extends 'library_web/base_reader.html' %}
+{% block title %}Portal lector - Biblioteca Digital{% endblock %}
+{% block content %}
+<section class="reader-hero">
+    <div>
+        <p class="eyebrow">Portal lector</p>
+        <h1>Hola, {{ request.user.first_name|default:request.user.username }}</h1>
+        <p>Consulta el catalogo, revisa tus reservas y controla tus prestamos activos desde una vista enfocada en lectura.</p>
+    </div>
+    <a class="ui-button ui-button-primary" href="{% url 'library_web:reader_book_list' %}">Buscar libros</a>
+</section>
+
+<section class="metrics-grid">
+    <article class="metric-card ui-card">
+        <span>Copias disponibles</span>
+        <strong>{{ summary.book_inventory.available_copies }}</strong>
+    </article>
+    <article class="metric-card ui-card">
+        <span>Mis prestamos</span>
+        <strong>{{ my_loans|length }}</strong>
+    </article>
+    <article class="metric-card ui-card">
+        <span>Mis reservas</span>
+        <strong>{{ my_reservations|length }}</strong>
+    </article>
+    <article class="metric-card ui-card">
+        <span>Sanciones activas</span>
+        <strong>{{ my_sanctions|length }}</strong>
+    </article>
+</section>
+
+<section class="two-column">
+    <article class="ui-card">
+        <div class="card-header-row">
+            <div>
+                <p class="eyebrow">Catalogo</p>
+                <h2>Disponibles ahora</h2>
+            </div>
+            <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:reader_book_list' %}">Ver todo</a>
+        </div>
+        <div class="item-list">
+            {% for book in available_books %}
+            <div class="item-row">
+                <div>
+                    <strong>{{ book.title }}</strong>
+                    <span>{% for author in book.authors.all %}{{ author.name }}{% if not forloop.last %}, {% endif %}{% empty %}Autor no registrado{% endfor %}</span>
+                </div>
+                <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:reader_reservation_create' %}?book={{ book.id }}">Reservar</a>
+            </div>
+            {% empty %}
+            <div class="empty-state">No hay libros disponibles en este momento.</div>
+            {% endfor %}
+        </div>
+    </article>
+
+    <article class="ui-card">
+        <div class="card-header-row">
+            <div>
+                <p class="eyebrow">Actividad</p>
+                <h2>Mis prestamos</h2>
+            </div>
+            <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:reader_loan_list' %}">Detalle</a>
+        </div>
+        <div class="item-list">
+            {% for loan in my_loans %}
+            <div class="item-row">
+                <div>
+                    <strong>{{ loan.book.title }}</strong>
+                    <span>Vence: {{ loan.due_at|date:'Y-m-d H:i' }}</span>
+                </div>
+                <span class="ui-badge">{{ loan.get_status_display }}</span>
+            </div>
+            {% empty %}
+            <div class="empty-state">Todavia no tienes prestamos registrados.</div>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+
+<section class="two-column">
+    <article class="ui-card">
+        <div class="card-header-row">
+            <div>
+                <p class="eyebrow">Reservas</p>
+                <h2>Reservas recientes</h2>
+            </div>
+            <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:reader_reservation_list' %}">Detalle</a>
+        </div>
+        <div class="item-list">
+            {% for reservation in my_reservations %}
+            <div class="item-row">
+                <div>
+                    <strong>{{ reservation.book.title }}</strong>
+                    <span>Expira: {{ reservation.expires_at|date:'Y-m-d H:i' }}</span>
+                </div>
+                <span class="ui-badge">{{ reservation.get_status_display }}</span>
+            </div>
+            {% empty %}
+            <div class="empty-state">No tienes reservas activas.</div>
+            {% endfor %}
+        </div>
+    </article>
+
+    <article class="ui-card">
+        <div class="card-header-row">
+            <div>
+                <p class="eyebrow">Estado personal</p>
+                <h2>Sanciones</h2>
+            </div>
+            <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:reader_sanction_list' %}">Detalle</a>
+        </div>
+        <div class="item-list">
+            {% for sanction in my_sanctions %}
+            <div class="item-row">
+                <div>
+                    <strong>{{ sanction.reason|default:'Sancion registrada' }}</strong>
+                    <span>Finaliza: {{ sanction.ends_at|date:'Y-m-d H:i' }}</span>
+                </div>
+                {% if sanction.is_active %}<span class="ui-badge ui-badge-danger">Activa</span>{% else %}<span class="ui-badge">Finalizada</span>{% endif %}
+            </div>
+            {% empty %}
+            <div class="empty-state">No tienes sanciones registradas.</div>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

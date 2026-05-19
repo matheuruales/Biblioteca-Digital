@@ -1,17 +1,30 @@
-const tokenForm = document.querySelector('#tokenForm');
-const tokenInput = document.querySelector('#tokenInput');
+const loginView = document.querySelector('#loginView');
+const dashboardView = document.querySelector('#dashboardView');
+const loginForm = document.querySelector('#loginForm');
+const usernameInput = document.querySelector('#usernameInput');
+const passwordInput = document.querySelector('#passwordInput');
+const loginButton = document.querySelector('#loginButton');
+const loginStatus = document.querySelector('#loginStatus');
+const logoutButton = document.querySelector('#logoutButton');
+const sessionUser = document.querySelector('#sessionUser');
 const statusStrip = document.querySelector('#statusStrip');
 const metricsNode = document.querySelector('#metrics');
 const exportReport = document.querySelector('#exportReport');
 let loansChart;
 let statusChart;
 
-tokenInput.value = localStorage.getItem('dashboardToken') || '';
+const TOKEN_KEY = 'dashboardAccessToken';
+const USER_KEY = 'dashboardUser';
 
-tokenForm.addEventListener('submit', (event) => {
+loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    localStorage.setItem('dashboardToken', tokenInput.value.trim());
-    loadDashboard();
+    await login();
+});
+
+logoutButton.addEventListener('click', () => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    showLogin();
 });
 
 document.querySelectorAll('[data-format]').forEach((button) => {
@@ -45,7 +58,79 @@ document.querySelectorAll('[data-format]').forEach((button) => {
 });
 
 function currentToken() {
-    return tokenInput.value.trim() || localStorage.getItem('dashboardToken') || '';
+    return localStorage.getItem(TOKEN_KEY) || '';
+}
+
+async function login() {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!username || !password) {
+        setLoginStatus('Ingresa usuario y contrasena.');
+        return;
+    }
+
+    loginButton.disabled = true;
+    setLoginStatus('Validando credenciales...', true);
+
+    try {
+        const response = await fetch('/api/auth/token/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Usuario o contrasena invalidos.');
+        }
+
+        const data = await response.json();
+        if (data.role !== 'librarian') {
+            throw new Error('Esta vista requiere una cuenta bibliotecaria.');
+        }
+
+        localStorage.setItem(TOKEN_KEY, data.access);
+        localStorage.setItem(USER_KEY, JSON.stringify({
+            username: data.username,
+            role: data.role,
+        }));
+        passwordInput.value = '';
+        setLoginStatus('Acceso concedido.', true);
+        showDashboard();
+        await loadDashboard();
+    } catch (error) {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
+        setLoginStatus(error.message);
+    } finally {
+        loginButton.disabled = false;
+    }
+}
+
+function setLoginStatus(message, ok = false) {
+    loginStatus.textContent = message;
+    loginStatus.className = ok ? 'login-status ok' : 'login-status';
+}
+
+function showLogin() {
+    dashboardView.hidden = true;
+    loginView.hidden = false;
+    usernameInput.focus();
+}
+
+function showDashboard() {
+    const user = storedUser();
+    sessionUser.textContent = user?.username ? `Sesion: ${user.username}` : 'Sesion administrativa';
+    loginView.hidden = true;
+    dashboardView.hidden = false;
+}
+
+function storedUser() {
+    try {
+        return JSON.parse(localStorage.getItem(USER_KEY));
+    } catch (error) {
+        return null;
+    }
 }
 
 async function apiGet(path) {
@@ -54,6 +139,12 @@ async function apiGet(path) {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     if (!response.ok) {
+        if (response.status === 401) {
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(USER_KEY);
+            showLogin();
+            throw new Error('La sesion vencio. Inicia sesion nuevamente.');
+        }
         throw new Error(response.status === 403 ? 'Acceso restringido a bibliotecarios.' : 'No se pudo cargar la informacion.');
     }
     return response.json();
@@ -180,5 +271,8 @@ function escapeHtml(value) {
 }
 
 if (currentToken()) {
+    showDashboard();
     loadDashboard();
+} else {
+    showLogin();
 }

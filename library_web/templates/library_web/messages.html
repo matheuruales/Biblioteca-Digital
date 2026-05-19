@@ -1,0 +1,9 @@
+{% if messages %}
+<div class="message-stack" role="status" aria-live="polite">
+    {% for message in messages %}
+    <div class="ui-alert {{ message.tags|default:'info' }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

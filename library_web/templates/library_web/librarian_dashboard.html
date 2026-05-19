@@ -1,0 +1,158 @@
+{% extends 'library_web/base_librarian.html' %}
+{% block title %}Dashboard bibliotecario - Biblioteca Digital{% endblock %}
+{% block page_title %}Dashboard bibliotecario{% endblock %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+{% block content %}
+<section class="toolbar">
+    <div>
+        <p class="eyebrow">Resumen operativo</p>
+        <h2>Control de biblioteca</h2>
+        <span>Datos generados desde la base conectada al sistema.</span>
+    </div>
+    <div class="toolbar-actions">
+        <a class="ui-button ui-button-secondary" href="{% url 'library_web:export_report' 'csv' %}?report=loans_by_month">CSV</a>
+        <a class="ui-button ui-button-secondary" href="{% url 'library_web:export_report' 'pdf' %}?report=loans_by_month">PDF</a>
+        <a class="ui-button ui-button-primary" href="{% url 'library_web:book_create' %}">Nuevo libro</a>
+    </div>
+</section>
+
+<section class="metrics-grid">
+    <article class="metric-card ui-card"><span>Libros</span><strong>{{ summary.totals.books }}</strong></article>
+    <article class="metric-card ui-card"><span>Usuarios</span><strong>{{ summary.totals.users }}</strong></article>
+    <article class="metric-card ui-card"><span>Prestamos activos</span><strong>{{ summary.totals.active_loans }}</strong></article>
+    <article class="metric-card ui-card"><span>Reservas activas</span><strong>{{ summary.totals.active_reservations }}</strong></article>
+</section>
+
+<section class="chart-grid">
+    <article class="ui-card chart-card">
+        <div class="card-header-row">
+            <div>
+                <p class="eyebrow">Tendencia</p>
+                <h2>Prestamos por mes</h2>
+            </div>
+        </div>
+        <canvas id="loansChart" height="120"></canvas>
+    </article>
+    <article class="ui-card chart-card">
+        <div class="card-header-row">
+            <div>
+                <p class="eyebrow">Estados</p>
+                <h2>Prestamos por estado</h2>
+            </div>
+        </div>
+        <canvas id="statusChart" height="120"></canvas>
+    </article>
+</section>
+
+<section class="three-column">
+    <article class="ui-card">
+        <div class="card-header-row">
+            <div>
+                <p class="eyebrow">Top</p>
+                <h2>Libros mas reservados</h2>
+            </div>
+        </div>
+        <div class="compact-table">
+            {% for row in reports.most_reserved_books %}
+            <div><span>{{ row.title }}</span><strong>{{ row.reservations_count }}</strong></div>
+            {% empty %}
+            <div class="empty-state">Sin datos.</div>
+            {% endfor %}
+        </div>
+    </article>
+    <article class="ui-card">
+        <div class="card-header-row">
+            <div>
+                <p class="eyebrow">Lectura</p>
+                <h2>Autores mas leidos</h2>
+            </div>
+        </div>
+        <div class="compact-table">
+            {% for row in reports.most_read_authors %}
+            <div><span>{{ row.name }}</span><strong>{{ row.loans_count }}</strong></div>
+            {% empty %}
+            <div class="empty-state">Sin datos.</div>
+            {% endfor %}
+        </div>
+    </article>
+    <article class="ui-card">
+        <div class="card-header-row">
+            <div>
+                <p class="eyebrow">Usuarios</p>
+                <h2>Mas prestamos</h2>
+            </div>
+        </div>
+        <div class="compact-table">
+            {% for row in reports.top_users_by_loans %}
+            <div><span>{{ row.username }}</span><strong>{{ row.loans_count }}</strong></div>
+            {% empty %}
+            <div class="empty-state">Sin datos.</div>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+
+<section class="two-column">
+    <article class="ui-card">
+        <div class="card-header-row">
+            <div>
+                <p class="eyebrow">Reciente</p>
+                <h2>Prestamos</h2>
+            </div>
+            <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:loan_list' %}">Ver</a>
+        </div>
+        <div class="item-list">
+            {% for loan in recent_loans %}
+            <div class="item-row"><div><strong>{{ loan.book.title }}</strong><span>{{ loan.user.username }} - {{ loan.due_at|date:'Y-m-d H:i' }}</span></div><span class="ui-badge">{{ loan.get_status_display }}</span></div>
+            {% empty %}
+            <div class="empty-state">Sin prestamos.</div>
+            {% endfor %}
+        </div>
+    </article>
+    <article class="ui-card">
+        <div class="card-header-row">
+            <div>
+                <p class="eyebrow">Reciente</p>
+                <h2>Reservas</h2>
+            </div>
+            <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:reservation_list' %}">Ver</a>
+        </div>
+        <div class="item-list">
+            {% for reservation in recent_reservations %}
+            <div class="item-row"><div><strong>{{ reservation.book.title }}</strong><span>{{ reservation.user.username }} - {{ reservation.reserved_at|date:'Y-m-d H:i' }}</span></div><span class="ui-badge">{{ reservation.get_status_display }}</span></div>
+            {% empty %}
+            <div class="empty-state">Sin reservas.</div>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+
+{{ reports.loans_by_month|json_script:"loans-by-month-data" }}
+{{ summary.loan_statuses|json_script:"loan-status-data" }}
+{% endblock %}
+{% block scripts %}
+<script>
+const loansByMonth = JSON.parse(document.getElementById('loans-by-month-data').textContent);
+const loanStatuses = JSON.parse(document.getElementById('loan-status-data').textContent);
+
+new Chart(document.getElementById('loansChart'), {
+    type: 'bar',
+    data: {
+        labels: loansByMonth.map(row => row.month),
+        datasets: [{ label: 'Prestamos', data: loansByMonth.map(row => row.total), backgroundColor: '#111827', borderRadius: 4 }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+});
+
+new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+        labels: loanStatuses.map(row => row.status),
+        datasets: [{ data: loanStatuses.map(row => row.total), backgroundColor: ['#111827', '#2563eb', '#b45309', '#dc2626'] }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } }, cutout: '62%' }
+});
+</script>
+{% endblock %}
