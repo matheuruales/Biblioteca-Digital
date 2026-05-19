@@ -81,3 +81,10 @@ class ReportsApiTests(APITestCase):
         self.assertEqual(pdf_response.status_code, status.HTTP_200_OK)
         self.assertEqual(pdf_response['Content-Type'], 'application/pdf')
         self.assertTrue(pdf_response.content.startswith(b'%PDF'))
+
+    def test_admin_dashboard_page_renders(self):
+        response = self.client.get('/admin-dashboard/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, 'Dashboard administrativo')
+        self.assertContains(response, 'admin_dashboard.js')

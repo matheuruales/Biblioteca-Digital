@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -57,6 +58,10 @@ class ExportReportView(APIView):
 
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
+
+
+def admin_dashboard(request):
+    return render(request, 'reports/admin_dashboard.html')
 
 
 def _positive_int(value, default, maximum):
