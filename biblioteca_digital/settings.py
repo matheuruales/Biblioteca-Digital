@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django_filters',
     'accounts',
     'catalog',
+    'circulation',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,11 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+# --- Circulación (Dev 2): préstamos, reservas, sanciones ---
+CIRCULATION_MAX_ACTIVE_LOANS = 3
+CIRCULATION_LOAN_DAYS = 14
+CIRCULATION_RESERVATION_HOURS = 48
+CIRCULATION_DUE_SOON_HOURS = 24
+CIRCULATION_SANCTION_DAYS_PER_OVERDUE_DAY = 1
+CIRCULATION_MAX_SANCTION_DAYS = 30
