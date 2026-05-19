@@ -1,0 +1,56 @@
+{% extends 'library_web/base_librarian.html' %}
+{% block title %}Reportes - Biblioteca Digital{% endblock %}
+{% block page_title %}Reportes y exportaciones{% endblock %}
+{% block content %}
+<section class="toolbar">
+    <div>
+        <p class="eyebrow">Reportes</p>
+        <h2>Indicadores exportables</h2>
+        <span>Descarga los reportes en CSV o PDF desde los datos reales del sistema.</span>
+    </div>
+</section>
+
+<section class="report-grid">
+    {% for report_name, label in report_labels.items %}
+    <article class="ui-card">
+        <div class="card-header-row">
+            <div>
+                <p class="eyebrow">Reporte</p>
+                <h2>{{ label }}</h2>
+            </div>
+        </div>
+        <div class="toolbar-actions">
+            <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:export_report' 'csv' %}?report={{ report_name }}">CSV</a>
+            <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:export_report' 'pdf' %}?report={{ report_name }}">PDF</a>
+        </div>
+    </article>
+    {% endfor %}
+</section>
+
+<section class="three-column">
+    <article class="ui-card">
+        <h2>Libros mas reservados</h2>
+        <div class="compact-table">
+            {% for row in reports.most_reserved_books %}
+            <div><span>{{ row.title }}</span><strong>{{ row.reservations_count }}</strong></div>
+            {% empty %}<div class="empty-state">Sin datos.</div>{% endfor %}
+        </div>
+    </article>
+    <article class="ui-card">
+        <h2>Autores mas leidos</h2>
+        <div class="compact-table">
+            {% for row in reports.most_read_authors %}
+            <div><span>{{ row.name }}</span><strong>{{ row.loans_count }}</strong></div>
+            {% empty %}<div class="empty-state">Sin datos.</div>{% endfor %}
+        </div>
+    </article>
+    <article class="ui-card">
+        <h2>Usuarios con mas prestamos</h2>
+        <div class="compact-table">
+            {% for row in reports.top_users_by_loans %}
+            <div><span>{{ row.username }}</span><strong>{{ row.loans_count }}</strong></div>
+            {% empty %}<div class="empty-state">Sin datos.</div>{% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

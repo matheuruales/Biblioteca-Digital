@@ -1,0 +1,50 @@
+{% extends base_template %}
+{% block title %}Usuarios - Biblioteca Digital{% endblock %}
+{% block page_title %}Usuarios{% endblock %}
+{% block content %}
+<section class="toolbar">
+    <div>
+        <p class="eyebrow">Gestion</p>
+        <h2>Usuarios</h2>
+        <span>Alta, edicion, roles y estado de usuarios.</span>
+    </div>
+    <a class="ui-button ui-button-primary" href="{% url 'library_web:user_create' %}">Nuevo usuario</a>
+</section>
+<form class="filter-panel" method="get">
+    <input name="search" placeholder="Buscar usuario o correo" value="{{ request.GET.search }}">
+    <select name="role">
+        <option value="">Rol</option>
+        <option value="reader" {% if request.GET.role == 'reader' %}selected{% endif %}>Lector</option>
+        <option value="librarian" {% if request.GET.role == 'librarian' %}selected{% endif %}>Bibliotecario</option>
+    </select>
+    <select name="status">
+        <option value="">Estado</option>
+        <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Activo</option>
+        <option value="blocked" {% if request.GET.status == 'blocked' %}selected{% endif %}>Bloqueado</option>
+    </select>
+    <button class="ui-button ui-button-secondary" type="submit">Filtrar</button>
+</form>
+<section class="ui-card table-card">
+    <div class="table-responsive">
+        <table class="ui-table">
+            <thead><tr><th>Usuario</th><th>Correo</th><th>Rol</th><th>Estado</th><th class="table-actions">Acciones</th></tr></thead>
+            <tbody>
+                {% for user_item in users %}
+                <tr>
+                    <td><strong>{{ user_item.username }}</strong></td>
+                    <td>{{ user_item.email }}</td>
+                    <td><span class="ui-badge">{{ user_item.get_role_display }}</span></td>
+                    <td>{% if user_item.status == 'active' %}<span class="ui-badge ui-badge-success">Activo</span>{% else %}<span class="ui-badge ui-badge-danger">Bloqueado</span>{% endif %}</td>
+                    <td class="table-actions">
+                        <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:user_update' user_item.id %}">Editar</a>
+                        <a class="ui-button ui-button-danger ui-button-sm" href="{% url 'library_web:user_delete' user_item.id %}">Eliminar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5"><div class="empty-state">No hay usuarios con esos filtros.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

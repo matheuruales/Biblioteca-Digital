@@ -1,0 +1,33 @@
+{% extends base_template %}
+{% block title %}Sanciones - Biblioteca Digital{% endblock %}
+{% block page_title %}Sanciones{% endblock %}
+{% block content %}
+<section class="toolbar">
+    <div>
+        <p class="eyebrow">{% if request.user.is_librarian %}Control{% else %}Estado personal{% endif %}</p>
+        <h2>{% if request.user.is_librarian %}Sanciones{% else %}Mis sanciones{% endif %}</h2>
+        <span>{% if request.user.is_librarian %}Seguimiento de sanciones por retrasos.{% else %}Revisa si tienes restricciones activas.{% endif %}</span>
+    </div>
+</section>
+<section class="ui-card table-card">
+    <div class="table-responsive">
+        <table class="ui-table">
+            <thead><tr>{% if request.user.is_librarian %}<th>Usuario</th>{% endif %}<th>Libro</th><th>Motivo</th><th>Monto</th><th>Termina</th><th>Estado</th></tr></thead>
+            <tbody>
+                {% for sanction in sanctions %}
+                <tr>
+                    {% if request.user.is_librarian %}<td>{{ sanction.user.username }}</td>{% endif %}
+                    <td>{% if sanction.loan %}<strong>{{ sanction.loan.book.title }}</strong>{% else %}-{% endif %}</td>
+                    <td>{{ sanction.reason|default:'-' }}</td>
+                    <td>{{ sanction.amount }}</td>
+                    <td>{{ sanction.ends_at|date:'Y-m-d H:i' }}</td>
+                    <td>{% if sanction.is_active %}<span class="ui-badge ui-badge-danger">Activa</span>{% else %}<span class="ui-badge">Finalizada</span>{% endif %}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="{% if request.user.is_librarian %}6{% else %}5{% endif %}"><div class="empty-state">No hay sanciones registradas.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

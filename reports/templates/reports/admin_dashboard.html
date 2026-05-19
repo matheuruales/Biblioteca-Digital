@@ -9,18 +9,47 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <section class="login-view" id="loginView" aria-live="polite">
+        <div class="login-shell">
+            <aside class="login-brand">
+                <div class="brand-mark" aria-hidden="true">
+                    <span></span>
+                </div>
+                <p class="eyebrow">Biblioteca Digital</p>
+                <h1>Acceso administrativo</h1>
+                <p class="login-copy">Gestiona reportes, actividad de prestamos y estado operativo del sistema.</p>
+            </aside>
+
+            <form class="login-card" id="loginForm">
+                <div>
+                    <h2>Iniciar sesion</h2>
+                    <p>Usa una cuenta con rol bibliotecario.</p>
+                </div>
+                <label for="usernameInput">Usuario</label>
+                <input id="usernameInput" name="username" type="text" autocomplete="username" placeholder="matheu_admin" required>
+                <label for="passwordInput">Contrasena</label>
+                <input id="passwordInput" name="password" type="password" autocomplete="current-password" placeholder="Biblioteca2026!" required>
+                <button type="submit" id="loginButton">Entrar</button>
+                <div class="login-status" id="loginStatus"></div>
+                <div class="test-credentials">
+                    <strong>Credenciales de prueba</strong>
+                    <span>Bibliotecario: matheu_admin / Biblioteca2026!</span>
+                    <span>Lector: matheu_lector / Biblioteca2026!</span>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="dashboard-view" id="dashboardView" hidden>
     <header class="topbar">
         <div>
             <p class="eyebrow">Biblioteca Digital</p>
             <h1>Dashboard administrativo</h1>
         </div>
-        <form class="token-form" id="tokenForm">
-            <label for="tokenInput">Token JWT</label>
-            <div class="token-row">
-                <input id="tokenInput" name="token" type="password" autocomplete="off" placeholder="Pega el access token">
-                <button type="submit">Conectar</button>
-            </div>
-        </form>
+        <div class="session-card">
+            <span id="sessionUser">Sesion administrativa</span>
+            <button type="button" id="logoutButton">Salir</button>
+        </div>
     </header>
 
     <main class="layout">
@@ -86,6 +115,7 @@
             </article>
         </section>
     </main>
+    </section>
 
     <script src="{% static 'reports/admin_dashboard.js' %}"></script>
 </body>

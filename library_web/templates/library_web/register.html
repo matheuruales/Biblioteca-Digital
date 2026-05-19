@@ -1,0 +1,19 @@
+{% extends 'library_web/base_public.html' %}
+{% block title %}Registro - Biblioteca Digital{% endblock %}
+{% block content %}
+<section class="auth-page">
+    <div class="auth-card ui-card single-auth-card">
+        <div class="section-heading">
+            <p class="eyebrow">Registro publico</p>
+            <h1>Crear cuenta lectora</h1>
+            <span>Las cuentas creadas desde aqui siempre quedan con rol lector.</span>
+        </div>
+        <form method="post" class="form-stack" novalidate>
+            {% csrf_token %}
+            {% include 'library_web/form_fields.html' %}
+            <button class="ui-button ui-button-primary full-width" type="submit">Crear cuenta</button>
+        </form>
+        <p class="form-footer">Ya tienes cuenta? <a href="{% url 'library_web:login' %}">Inicia sesion</a></p>
+    </div>
+</section>
+{% endblock %}

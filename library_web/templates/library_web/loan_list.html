@@ -1,0 +1,40 @@
+{% extends base_template %}
+{% block title %}Prestamos - Biblioteca Digital{% endblock %}
+{% block page_title %}Prestamos{% endblock %}
+{% block content %}
+<section class="toolbar">
+    <div>
+        <p class="eyebrow">{% if request.user.is_librarian %}Circulacion{% else %}Portal lector{% endif %}</p>
+        <h2>{% if request.user.is_librarian %}Prestamos{% else %}Mis prestamos{% endif %}</h2>
+        <span>{% if request.user.is_librarian %}Registro de prestamos y devoluciones.{% else %}Control de fechas y estado de tus prestamos.{% endif %}</span>
+    </div>
+    {% if request.user.is_librarian %}
+    <a class="ui-button ui-button-primary" href="{% url 'library_web:loan_create' %}">Registrar prestamo</a>
+    {% endif %}
+</section>
+<section class="ui-card table-card">
+    <div class="table-responsive">
+        <table class="ui-table">
+            <thead><tr>{% if request.user.is_librarian %}<th>Usuario</th>{% endif %}<th>Libro</th><th>Estado</th><th>Prestado</th><th>Vence</th><th class="table-actions">Acciones</th></tr></thead>
+            <tbody>
+                {% for loan in loans %}
+                <tr>
+                    {% if request.user.is_librarian %}<td>{{ loan.user.username }}</td>{% endif %}
+                    <td><strong>{{ loan.book.title }}</strong></td>
+                    <td>{% if loan.status == 'overdue' %}<span class="ui-badge ui-badge-danger">{{ loan.get_status_display }}</span>{% else %}<span class="ui-badge">{{ loan.get_status_display }}</span>{% endif %}</td>
+                    <td>{{ loan.loaned_at|date:'Y-m-d H:i' }}</td>
+                    <td>{{ loan.due_at|date:'Y-m-d H:i' }}</td>
+                    <td class="table-actions">
+                        {% if request.user.is_librarian and loan.is_open %}
+                        <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:loan_return' loan.id %}">Devolver</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="{% if request.user.is_librarian %}6{% else %}5{% endif %}"><div class="empty-state">No hay prestamos registrados.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

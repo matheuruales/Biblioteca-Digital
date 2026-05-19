@@ -1,0 +1,19 @@
+{% extends base_template %}
+{% block title %}Eliminar - Biblioteca Digital{% endblock %}
+{% block page_title %}Confirmar eliminacion{% endblock %}
+{% block content %}
+<section class="form-layout">
+    <article class="ui-card form-card">
+        <div class="section-heading">
+            <p class="eyebrow">Accion destructiva</p>
+            <h2>Confirmar eliminacion</h2>
+            <span>Vas a eliminar: <strong>{{ object }}</strong></span>
+        </div>
+        <form method="post" class="form-actions">
+            {% csrf_token %}
+            <button class="ui-button ui-button-danger" type="submit">Eliminar</button>
+            <button class="ui-button ui-button-secondary" type="button" onclick="history.back()">Cancelar</button>
+        </form>
+    </article>
+</section>
+{% endblock %}
