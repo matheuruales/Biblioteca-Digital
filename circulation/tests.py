@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.core.management import call_command
 from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
@@ -112,5 +113,22 @@ class CirculationApiTests(APITestCase):
         reserve_response = self.client.post('/api/reservations/', {'book_id': self.book.id}, format='json')
         self.assertEqual(reserve_response.status_code, status.HTTP_403_FORBIDDEN)
 
-    # La cobertura del comando `circulation_maintenance` se agrega en la rama de mantenimiento (Dev2).
-# Create your tests here.
+    def test_management_command_sends_due_soon_and_overdue_emails(self):
+        soon_due = timezone.now() + timedelta(hours=2)
+        overdue = timezone.now() - timedelta(hours=2)
+
+        other_book = Book.objects.create(
+            title='Otro',
+            isbn='isbn-2',
+            total_copies=1,
+            available_copies=1,
+        )
+
+        Loan.objects.create(user=self.reader, book=self.book, due_at=soon_due, created_by=self.librarian)
+        Loan.objects.create(user=self.reader, book=other_book, due_at=overdue, created_by=self.librarian)
+
+        call_command('circulation_maintenance')
+
+        self.assertGreaterEqual(len(mail.outbox), 1)
+        self.assertTrue(Loan.objects.filter(due_soon_notified_at__isnull=False).exists())
+        self.assertTrue(Loan.objects.filter(overdue_notified_at__isnull=False).exists())
