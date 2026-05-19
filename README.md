@@ -14,7 +14,28 @@ Esta entrega cubre la parte de Matheu:
 - CRUD de autores, categorias y libros.
 - Busqueda avanzada y filtros de libros.
 
-No incluye prestamos, reservas, sanciones, reportes, graficos, CSV ni PDF.
+No incluye reportes, graficos, CSV ni PDF.
+
+## Préstamos, Reservas y Sanciones (Dev 2)
+
+### Endpoints
+
+- `GET /api/reservations/` (lector: propias / bibliotecario: todas)
+- `POST /api/reservations/` `{ "book_id": <id> }`
+- `POST /api/reservations/{id}/cancel/`
+- `GET /api/loans/` (lector: propios / bibliotecario: todos)
+- `POST /api/loans/` (solo bibliotecario) `{ "book_id": <id>, "user_id": <id>, "due_at": "2026-05-19T10:00:00Z" }`
+- `POST /api/loans/{id}/return/` (solo bibliotecario)
+- `GET /api/sanctions/` (lector: propias / bibliotecario: todas)
+- `GET /api/books/{book_id}/state/` estado agregado del libro (`disponible`, `reservado`, `prestado`, `retrasado`)
+
+### Tarea automática de correos / sanciones
+
+Ejecuta mantenimiento de circulación (expira reservas, marca vencidos, genera sanciones y envía correos de vencimiento/retraso):
+
+```bash
+python manage.py circulation_maintenance
+```
 
 ## Instalacion
 
