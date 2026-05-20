@@ -1,0 +1,13 @@
+.env
+.env.*
+.venv/
+.vercel/
+.vercel_python_packages/
+.git/
+__pycache__/
+*.py[cod]
+db.sqlite3
+backups/
+staticfiles/
+supabase/
+.DS_Store

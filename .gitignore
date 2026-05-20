@@ -5,3 +5,9 @@ db.sqlite3
 .env
 backups/
 .DS_Store
+.vercel/
+.python-version
+.env.local
+staticfiles/
+.vercel_python_packages/
+.vercel

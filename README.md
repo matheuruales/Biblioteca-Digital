@@ -101,6 +101,31 @@ python3 -m venv .venv
 
 Si existe `.env` con `DATABASE_URL`, Django usa Supabase/PostgreSQL. Si no existe, usa `db.sqlite3`.
 
+## Despliegue En Vercel
+
+La app esta preparada para Vercel con:
+
+- `api/index.py` como entrada WSGI.
+- `vercel.json` con rewrite global hacia Django.
+- `pyproject.toml` con Python 3.12 y dependencias.
+- WhiteNoise para servir archivos estaticos.
+
+Variables necesarias en Vercel Production:
+
+- `DATABASE_URL`
+- `DJANGO_SECRET_KEY`
+- `DJANGO_DEBUG=False`
+- `DJANGO_ALLOWED_HOSTS`
+- `DJANGO_CSRF_TRUSTED_ORIGINS`
+- `SUPABASE_PROJECT_REF`
+- `SUPABASE_DB_PASSWORD`
+
+Deploy:
+
+```bash
+vercel --prod --yes
+```
+
 ## Endpoints De Autenticacion
 
 - `POST /api/auth/register/`
