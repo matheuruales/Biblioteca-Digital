@@ -1,0 +1,46 @@
+{% extends base_template %}
+{% block title %}Reservas - Biblioteca Digital{% endblock %}
+{% block page_title %}Reservas{% endblock %}
+{% block content %}
+<section class="toolbar">
+    <div>
+        <p class="eyebrow">{% if request.user.is_librarian %}Circulacion{% else %}Portal lector{% endif %}</p>
+        <h2>{% if request.user.is_librarian %}Reservas{% else %}Mis reservas{% endif %}</h2>
+        <span>{% if request.user.is_librarian %}Control de reservas activas, cumplidas y canceladas.{% else %}Consulta y cancela tus reservas activas.{% endif %}</span>
+    </div>
+    {% if request.user.is_librarian %}
+    <a class="ui-button ui-button-primary" href="{% url 'library_web:reservation_create' %}">Nueva reserva</a>
+    {% else %}
+    <a class="ui-button ui-button-primary" href="{% url 'library_web:reader_book_list' %}">Buscar libro</a>
+    {% endif %}
+</section>
+<section class="ui-card table-card">
+    <div class="table-responsive">
+        <table class="ui-table">
+            <thead><tr>{% if request.user.is_librarian %}<th>Usuario</th>{% endif %}<th>Libro</th><th>Estado</th><th>Reservado</th><th>Expira</th><th class="table-actions">Acciones</th></tr></thead>
+            <tbody>
+                {% for reservation in reservations %}
+                <tr>
+                    {% if request.user.is_librarian %}<td>{{ reservation.user.username }}</td>{% endif %}
+                    <td><strong>{{ reservation.book.title }}</strong></td>
+                    <td><span class="ui-badge">{{ reservation.get_status_display }}</span></td>
+                    <td>{{ reservation.reserved_at|date:'Y-m-d H:i' }}</td>
+                    <td>{{ reservation.expires_at|date:'Y-m-d H:i' }}</td>
+                    <td class="table-actions">
+                        {% if reservation.status == 'active' %}
+                            {% if request.user.is_librarian %}
+                            <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:reservation_cancel' reservation.id %}">Cancelar</a>
+                            {% else %}
+                            <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:reader_reservation_cancel' reservation.id %}">Cancelar</a>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="{% if request.user.is_librarian %}6{% else %}5{% endif %}"><div class="empty-state">No hay reservas registradas.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

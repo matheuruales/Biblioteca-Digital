@@ -1,0 +1,122 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard administrativo</title>
+    <link rel="stylesheet" href="{% static 'reports/admin_dashboard.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <section class="login-view" id="loginView" aria-live="polite">
+        <div class="login-shell">
+            <aside class="login-brand">
+                <div class="brand-mark" aria-hidden="true">
+                    <span></span>
+                </div>
+                <p class="eyebrow">Biblioteca Digital</p>
+                <h1>Acceso administrativo</h1>
+                <p class="login-copy">Gestiona reportes, actividad de prestamos y estado operativo del sistema.</p>
+            </aside>
+
+            <form class="login-card" id="loginForm">
+                <div>
+                    <h2>Iniciar sesion</h2>
+                    <p>Usa una cuenta con rol bibliotecario.</p>
+                </div>
+                <label for="usernameInput">Usuario</label>
+                <input id="usernameInput" name="username" type="text" autocomplete="username" placeholder="matheu_admin" required>
+                <label for="passwordInput">Contrasena</label>
+                <input id="passwordInput" name="password" type="password" autocomplete="current-password" placeholder="Biblioteca2026!" required>
+                <button type="submit" id="loginButton">Entrar</button>
+                <div class="login-status" id="loginStatus"></div>
+                <div class="test-credentials">
+                    <strong>Credenciales de prueba</strong>
+                    <span>Bibliotecario: matheu_admin / Biblioteca2026!</span>
+                    <span>Lector: matheu_lector / Biblioteca2026!</span>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="dashboard-view" id="dashboardView" hidden>
+    <header class="topbar">
+        <div>
+            <p class="eyebrow">Biblioteca Digital</p>
+            <h1>Dashboard administrativo</h1>
+        </div>
+        <div class="session-card">
+            <span id="sessionUser">Sesion administrativa</span>
+            <button type="button" id="logoutButton">Salir</button>
+        </div>
+    </header>
+
+    <main class="layout">
+        <section class="status-strip" id="statusStrip" aria-live="polite">
+            <span>Esperando conexion con API administrativa.</span>
+        </section>
+
+        <section class="metrics" id="metrics"></section>
+
+        <section class="grid">
+            <article class="panel">
+                <div class="panel-header">
+                    <h2>Prestamos por mes</h2>
+                    <select id="exportReport">
+                        <option value="loans_by_month">Prestamos por mes</option>
+                        <option value="most_reserved_books">Libros mas reservados</option>
+                        <option value="most_read_authors">Autores mas leidos</option>
+                        <option value="top_users_by_loans">Usuarios con mas prestamos</option>
+                    </select>
+                </div>
+                <canvas id="loansChart" height="140"></canvas>
+                <div class="export-actions">
+                    <button type="button" data-format="csv">CSV</button>
+                    <button type="button" data-format="pdf">PDF</button>
+                </div>
+            </article>
+
+            <article class="panel">
+                <h2>Estado operativo</h2>
+                <canvas id="statusChart" height="140"></canvas>
+            </article>
+        </section>
+
+        <section class="tables">
+            <article class="panel">
+                <h2>Libros mas reservados</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Libro</th><th>ISBN</th><th>Reservas</th></tr></thead>
+                        <tbody id="reservedBooks"></tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="panel">
+                <h2>Autores mas leidos</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Autor</th><th>Prestamos</th></tr></thead>
+                        <tbody id="readAuthors"></tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="panel">
+                <h2>Usuarios con mas prestamos</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Usuario</th><th>Correo</th><th>Prestamos</th></tr></thead>
+                        <tbody id="topUsers"></tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+    </main>
+    </section>
+
+    <script src="{% static 'reports/admin_dashboard.js' %}"></script>
+</body>
+</html>

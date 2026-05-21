@@ -1,0 +1,39 @@
+{% extends base_template %}
+{% block title %}Categorias - Biblioteca Digital{% endblock %}
+{% block page_title %}Categorias{% endblock %}
+{% block content %}
+<section class="toolbar">
+    <div>
+        <p class="eyebrow">Catalogo</p>
+        <h2>Categorias</h2>
+        <span>Segmentacion del catalogo por areas y temas.</span>
+    </div>
+    <a class="ui-button ui-button-primary" href="{% url 'library_web:category_create' %}">Nueva categoria</a>
+</section>
+<form class="filter-panel compact-filter" method="get">
+    <input name="search" placeholder="Buscar categoria" value="{{ request.GET.search }}">
+    <button class="ui-button ui-button-secondary" type="submit">Filtrar</button>
+</form>
+<section class="ui-card table-card">
+    <div class="table-responsive">
+        <table class="ui-table">
+            <thead><tr><th>Nombre</th><th>Slug</th><th>Descripcion</th><th class="table-actions">Acciones</th></tr></thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td><strong>{{ category.name }}</strong></td>
+                    <td><code>{{ category.slug }}</code></td>
+                    <td>{{ category.description|default:'-' }}</td>
+                    <td class="table-actions">
+                        <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:category_update' category.id %}">Editar</a>
+                        <a class="ui-button ui-button-danger ui-button-sm" href="{% url 'library_web:category_delete' category.id %}">Eliminar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4"><div class="empty-state">No hay categorias registradas.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

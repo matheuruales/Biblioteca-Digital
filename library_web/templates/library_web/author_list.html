@@ -1,0 +1,39 @@
+{% extends base_template %}
+{% block title %}Autores - Biblioteca Digital{% endblock %}
+{% block page_title %}Autores{% endblock %}
+{% block content %}
+<section class="toolbar">
+    <div>
+        <p class="eyebrow">Catalogo</p>
+        <h2>Autores</h2>
+        <span>Gestion de autores relacionados con los libros.</span>
+    </div>
+    <a class="ui-button ui-button-primary" href="{% url 'library_web:author_create' %}">Nuevo autor</a>
+</section>
+<form class="filter-panel compact-filter" method="get">
+    <input name="search" placeholder="Buscar autor" value="{{ request.GET.search }}">
+    <button class="ui-button ui-button-secondary" type="submit">Filtrar</button>
+</form>
+<section class="ui-card table-card">
+    <div class="table-responsive">
+        <table class="ui-table">
+            <thead><tr><th>Nombre</th><th>Nacimiento</th><th>Fallecimiento</th><th class="table-actions">Acciones</th></tr></thead>
+            <tbody>
+                {% for author in authors %}
+                <tr>
+                    <td><strong>{{ author.name }}</strong></td>
+                    <td>{{ author.birth_date|default:'-' }}</td>
+                    <td>{{ author.death_date|default:'-' }}</td>
+                    <td class="table-actions">
+                        <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:author_update' author.id %}">Editar</a>
+                        <a class="ui-button ui-button-danger ui-button-sm" href="{% url 'library_web:author_delete' author.id %}">Eliminar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4"><div class="empty-state">No hay autores registrados.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

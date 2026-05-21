@@ -1,0 +1,40 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Portal lector - Biblioteca Digital{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'library_web/app.css' %}">
+    {% block head %}{% endblock %}
+</head>
+<body class="app-body reader-body">
+<div class="reader-shell">
+    <header class="reader-topbar">
+        <a class="brand-mark" href="{% url 'library_web:reader_dashboard' %}">
+            <span class="brand-icon">BD</span>
+            <span>
+                <strong>Biblioteca Digital</strong>
+                <small>Portal lector</small>
+            </span>
+        </a>
+        <nav class="reader-nav" aria-label="Navegacion lector">
+            <a href="{% url 'library_web:reader_dashboard' %}" {% if request.resolver_match.url_name == 'reader_dashboard' %}aria-current="page"{% endif %}>Inicio</a>
+            <a href="{% url 'library_web:reader_book_list' %}" {% if request.resolver_match.url_name == 'reader_book_list' %}aria-current="page"{% endif %}>Catalogo</a>
+            <a href="{% url 'library_web:reader_reservation_list' %}" {% if request.resolver_match.url_name == 'reader_reservation_list' %}aria-current="page"{% endif %}>Reservas</a>
+            <a href="{% url 'library_web:reader_loan_list' %}" {% if request.resolver_match.url_name == 'reader_loan_list' %}aria-current="page"{% endif %}>Prestamos</a>
+            <a href="{% url 'library_web:reader_sanction_list' %}" {% if request.resolver_match.url_name == 'reader_sanction_list' %}aria-current="page"{% endif %}>Sanciones</a>
+        </nav>
+        <div class="account-pill">
+            <span>{{ request.user.username }}</span>
+            <a href="{% url 'library_web:logout' %}">Salir</a>
+        </div>
+    </header>
+    <main class="reader-main">
+        {% include 'library_web/messages.html' %}
+        {% block content %}{% endblock %}
+    </main>
+</div>
+{% block scripts %}{% endblock %}
+</body>
+</html>

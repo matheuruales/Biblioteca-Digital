@@ -1,0 +1,59 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Bibliotecario - Biblioteca Digital{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'library_web/app.css' %}">
+    {% block head %}{% endblock %}
+</head>
+<body class="app-body">
+<div class="admin-shell">
+    <aside class="admin-sidebar">
+        <a class="brand-mark sidebar-brand" href="{% url 'library_web:librarian_dashboard' %}">
+            <span class="brand-icon">BD</span>
+            <span>
+                <strong>Biblioteca Digital</strong>
+                <small>Consola bibliotecaria</small>
+            </span>
+        </a>
+        <nav class="side-nav" aria-label="Navegacion bibliotecario">
+            <a href="{% url 'library_web:librarian_dashboard' %}" {% if request.resolver_match.url_name == 'librarian_dashboard' %}aria-current="page"{% endif %}>Panel</a>
+            <span>Catalogo</span>
+            <a href="{% url 'library_web:book_list' %}" {% if request.resolver_match.url_name == 'book_list' %}aria-current="page"{% endif %}>Libros</a>
+            <a href="{% url 'library_web:author_list' %}" {% if request.resolver_match.url_name == 'author_list' %}aria-current="page"{% endif %}>Autores</a>
+            <a href="{% url 'library_web:category_list' %}" {% if request.resolver_match.url_name == 'category_list' %}aria-current="page"{% endif %}>Categorias</a>
+            <span>Circulacion</span>
+            <a href="{% url 'library_web:reservation_list' %}" {% if request.resolver_match.url_name == 'reservation_list' %}aria-current="page"{% endif %}>Reservas</a>
+            <a href="{% url 'library_web:loan_list' %}" {% if request.resolver_match.url_name == 'loan_list' %}aria-current="page"{% endif %}>Prestamos</a>
+            <a href="{% url 'library_web:sanction_list' %}" {% if request.resolver_match.url_name == 'sanction_list' %}aria-current="page"{% endif %}>Sanciones</a>
+            <span>Gestion</span>
+            <a href="{% url 'library_web:user_list' %}" {% if request.resolver_match.url_name == 'user_list' %}aria-current="page"{% endif %}>Usuarios</a>
+            <a href="{% url 'library_web:report_list' %}" {% if request.resolver_match.url_name == 'report_list' %}aria-current="page"{% endif %}>Reportes</a>
+        </nav>
+        <div class="sidebar-account">
+            <div>
+                <strong>{{ request.user.username }}</strong>
+                <small>{{ request.user.get_role_display }}</small>
+            </div>
+            <a class="ui-button ui-button-secondary ui-button-sm" href="{% url 'library_web:logout' %}">Salir</a>
+        </div>
+    </aside>
+    <div class="admin-content">
+        <header class="admin-topbar">
+            <div>
+                <p class="eyebrow">Sistema de Biblioteca Digital</p>
+                <h1>{% block page_title %}Panel administrativo{% endblock %}</h1>
+            </div>
+            <a class="ui-button ui-button-secondary" href="/admin/">Django Admin</a>
+        </header>
+        <main class="content-area">
+            {% include 'library_web/messages.html' %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+{% block scripts %}{% endblock %}
+</body>
+</html>

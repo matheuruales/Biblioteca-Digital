@@ -1,0 +1,22 @@
+{% extends base_template %}
+{% block title %}{{ title }} - Biblioteca Digital{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<section class="form-layout">
+    <article class="ui-card form-card">
+        <div class="section-heading">
+            <p class="eyebrow">Formulario</p>
+            <h2>{{ title }}</h2>
+            <span>Completa los campos y guarda los cambios.</span>
+        </div>
+        <form method="post" class="form-stack" novalidate>
+            {% csrf_token %}
+            {% include 'library_web/form_fields.html' %}
+            <div class="form-actions">
+                <button class="ui-button ui-button-primary" type="submit">{{ submit_label|default:'Guardar' }}</button>
+                <button class="ui-button ui-button-secondary" type="button" onclick="history.back()">Cancelar</button>
+            </div>
+        </form>
+    </article>
+</section>
+{% endblock %}

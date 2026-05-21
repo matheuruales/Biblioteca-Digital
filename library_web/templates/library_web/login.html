@@ -1,0 +1,39 @@
+{% extends 'library_web/base_public.html' %}
+{% block title %}Login - Biblioteca Digital{% endblock %}
+{% block content %}
+<section class="auth-page">
+    <div class="auth-shell">
+        <div class="auth-copy">
+            <span class="brand-icon">BD</span>
+            <p class="eyebrow">Biblioteca Digital</p>
+            <h1>Acceso al sistema</h1>
+            <p>El inicio de sesion redirige automaticamente al portal lector o a la consola bibliotecaria segun el rol de la cuenta.</p>
+            <div class="credential-grid">
+                <div>
+                    <span>Bibliotecario</span>
+                    <code>matheu_admin</code>
+                    <code>Biblioteca2026!</code>
+                </div>
+                <div>
+                    <span>Lector</span>
+                    <code>matheu_lector</code>
+                    <code>Biblioteca2026!</code>
+                </div>
+            </div>
+        </div>
+        <div class="auth-card ui-card">
+            <div class="section-heading">
+                <p class="eyebrow">Autenticacion</p>
+                <h2>Iniciar sesion</h2>
+                <span>Usa tus credenciales de lector o bibliotecario.</span>
+            </div>
+            <form method="post" class="form-stack" novalidate>
+                {% csrf_token %}
+                {% include 'library_web/form_fields.html' %}
+                <button class="ui-button ui-button-primary full-width" type="submit">Entrar</button>
+            </form>
+            <p class="form-footer">No tienes cuenta lectora? <a href="{% url 'library_web:register' %}">Registrate</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

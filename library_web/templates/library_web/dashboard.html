@@ -1,0 +1,14 @@
+{% extends 'library_web/base_public.html' %}
+{% block title %}Dashboard - Biblioteca Digital{% endblock %}
+{% block content %}
+<section class="auth-page">
+    <div class="ui-card auth-card">
+        <div class="section-heading">
+            <p class="eyebrow">Redireccion</p>
+            <h1>Dashboard por rol</h1>
+            <span>Usa el acceso principal para entrar a tu interfaz correspondiente.</span>
+        </div>
+        <a class="ui-button ui-button-primary full-width" href="{% url 'library_web:home' %}">Continuar</a>
+    </div>
+</section>
+{% endblock %}
